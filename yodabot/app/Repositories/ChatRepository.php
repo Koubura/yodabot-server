@@ -67,7 +67,7 @@ class ChatRepository implements RepositoryInterface {
         if($expiration) {
             $now = Carbon::now();
             $e = Carbon::createFromFormat('Y-m-d H:m:i',$expiration->value);
-            if ($e <= $now) $needAccessToken = true;
+            if ($now->greaterThan($e)) $needAccessToken = true;
             else $needAccessToken = false;
         } else $needAccessToken = true;
 
@@ -91,19 +91,19 @@ class ChatRepository implements RepositoryInterface {
             $expires_seconds = $res->expires_in;
 
             if($last) {
-                InbentaConfigModel::update(["value" => $accessToken],$last->id);
-                InbentaConfigModel::update(
+                InbentaConfigRepository::update(["value" => $accessToken],$last->id);
+                InbentaConfigRepository::update(
                     [
                         "value" => Carbon::now()->addSeconds($expires_seconds)->format('Y-m-d H:m:i')
                     ],
                     InbentaConfigRepository::findByName('INBENTA_TOKEN_EXPIRATION_DATE')->id
                 );
             } else {
-                InbentaConfigModel::create([
+                InbentaConfigRepository::create([
                     "name" => "INBENTA_TOKEN",
                     "value" => $accessToken
                 ]);
-                InbentaConfigModel::create([
+                InbentaConfigRepository::create([
                     "name" => "INBENTA_TOKEN_EXPIRATION_DATE",
                     "value" => Carbon::now()->addSeconds($expires_seconds)->format('Y-m-d H:m:i')
                 ]);
@@ -124,7 +124,7 @@ class ChatRepository implements RepositoryInterface {
             'headers' => $headers
         ]);
 
-        InbentaConfigModel::create([
+        InbentaConfigRepository::create([
             "name" => "INBENTA_CHAT_URL",
             "value" => json_decode($res->getBody()->getContents())->apis->chatbot
         ]);
@@ -145,8 +145,6 @@ class ChatRepository implements RepositoryInterface {
     }
 
     public static function chat($message, $sessionToken) {
-
-
         $client = new Client();
         $headers = [
             'x-inbenta-key' => env('INBENTA_API_KEY'),
@@ -172,6 +170,36 @@ class ChatRepository implements RepositoryInterface {
             return self::chat($message,self::initConversation()->sessionToken);
         }
 
-        return $res->answers[0]->message;
+        return $res->answers[0];
+    }
+
+    public static function history($sessionToken) {
+        $client = new Client();
+        $headers = [
+            'x-inbenta-key' => env('INBENTA_API_KEY'),
+            'Authorization' => 'Bearer '.InbentaConfigRepository::findByName('INBENTA_TOKEN')->value,
+            'x-inbenta-session' => 'Bearer ' . $sessionToken,
+            'Content-Type' => 'application/json',
+        ];
+        $res = $client->request('GET', InbentaConfigRepository::findByName('INBENTA_CHAT_URL')->value . '/v1/conversation/history', [
+            'headers' => $headers
+        ]);
+
+        return json_decode($res->getBody()->getContents());
+    }
+
+    public static function variables($sessionToken) {
+        $client = new Client();
+        $headers = [
+            'x-inbenta-key' => env('INBENTA_API_KEY'),
+            'Authorization' => 'Bearer '.InbentaConfigRepository::findByName('INBENTA_TOKEN')->value,
+            'x-inbenta-session' => 'Bearer ' . $sessionToken,
+            'Content-Type' => 'application/json',
+        ];
+        $res = $client->request('GET', InbentaConfigRepository::findByName('INBENTA_CHAT_URL')->value . '/v1/conversation/variables', [
+            'headers' => $headers
+        ]);
+
+        return json_decode($res->getBody()->getContents());
     }
 }

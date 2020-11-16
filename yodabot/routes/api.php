@@ -19,6 +19,7 @@ Route::group(['prefix' => 'v1'], function() {
     Route::group(['prefix' => 'conversation'], function() {
         Route::get('',[ChatController::class, 'open']);
         Route::post('message',[ChatController::class, 'chat']);
-        // Route::get('closeChat',[ChatController::class, 'close']);
+        Route::post('history',[ChatController::class, 'history']);
+        Route::post('variables',[ChatController::class, 'variables']);
     });
 });
