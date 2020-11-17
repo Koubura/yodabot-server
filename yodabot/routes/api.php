@@ -20,6 +20,7 @@ Route::group(['prefix' => 'v1'], function() {
         Route::get('',[ChatController::class, 'open']);
         Route::post('message',[ChatController::class, 'chat']);
         Route::post('history',[ChatController::class, 'history']);
-        Route::post('variables',[ChatController::class, 'variables']);
+        Route::get('people',[ChatController::class, 'people']);
+        Route::get('films',[ChatController::class, 'films']);
     });
 });

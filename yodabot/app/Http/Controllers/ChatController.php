@@ -30,9 +30,16 @@ class ChatController extends Controller
         catch(\Exception $e) { return response()->json(["error" => $e->getMessage()], 400); };
     }
 
-    public function variables(Request $request) {
+    public function people() {
         try {
-            return response()->json(ChatRepository::variables($request->sessionToken),200);
+            return response()->json(ChatRepository::people(),200);
+        }
+        catch(\Exception $e) { return response()->json(["error" => $e->getMessage()], 400); };
+    }
+
+    public function films() {
+        try {
+            return response()->json(ChatRepository::films(),200);
         }
         catch(\Exception $e) { return response()->json(["error" => $e->getMessage()], 400); };
     }

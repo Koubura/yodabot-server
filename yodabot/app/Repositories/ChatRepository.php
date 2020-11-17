@@ -202,4 +202,28 @@ class ChatRepository implements RepositoryInterface {
 
         return json_decode($res->getBody()->getContents());
     }
+
+    public static function people() {
+        $client = new Client();
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+        $res = $client->request('GET', 'https://swapi.dev/api/people', [
+            'headers' => $headers
+        ]);
+
+        return json_decode($res->getBody()->getContents());
+    }
+
+    public static function films() {
+        $client = new Client();
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+        $res = $client->request('GET', 'https://swapi.dev/api/films', [
+            'headers' => $headers
+        ]);
+
+        return json_decode($res->getBody()->getContents());
+    }
 }
