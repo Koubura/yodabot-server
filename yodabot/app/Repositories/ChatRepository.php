@@ -8,6 +8,8 @@ use Carbon\Carbon;
 
 class ChatRepository implements RepositoryInterface {
 
+    public $inbenta_url = "https://api-gce3.inbenta.io/prod/chatbot";
+
     /**
      * Pre: --
      * Post: Retorna un json amb tota la informació.
@@ -137,7 +139,7 @@ class ChatRepository implements RepositoryInterface {
             'Authorization' => 'Bearer '.InbentaConfigRepository::findByName('INBENTA_TOKEN')->value
         ];
 
-        $res = $client->request('POST', InbentaConfigRepository::findByName('INBENTA_CHAT_URL')->value . '/v1/conversation' , [
+        $res = $client->request('POST', env('INBENTA_CHAT_URL') . '/v1/conversation' , [
             'headers' => $headers,
         ]);
 
@@ -156,7 +158,7 @@ class ChatRepository implements RepositoryInterface {
             'message' => $message
         ];
 
-        $res = $client->request('POST', InbentaConfigRepository::findByName('INBENTA_CHAT_URL')->value . '/v1/conversation/message',
+        $res = $client->request('POST', env('INBENTA_CHAT_URL') . '/v1/conversation/message',
             [
                 'headers' => $headers,
                 'json' => $body
@@ -181,7 +183,7 @@ class ChatRepository implements RepositoryInterface {
             'x-inbenta-session' => 'Bearer ' . $sessionToken,
             'Content-Type' => 'application/json',
         ];
-        $res = $client->request('GET', InbentaConfigRepository::findByName('INBENTA_CHAT_URL')->value . '/v1/conversation/history', [
+        $res = $client->request('GET', env('INBENTA_CHAT_URL') . '/v1/conversation/history', [
             'headers' => $headers
         ]);
 
@@ -196,7 +198,7 @@ class ChatRepository implements RepositoryInterface {
             'x-inbenta-session' => 'Bearer ' . $sessionToken,
             'Content-Type' => 'application/json',
         ];
-        $res = $client->request('GET', InbentaConfigRepository::findByName('INBENTA_CHAT_URL')->value . '/v1/conversation/variables', [
+        $res = $client->request('GET', env('INBENTA_CHAT_URL') . '/v1/conversation/variables', [
             'headers' => $headers
         ]);
 
